@@ -9,3 +9,7 @@ build: ## Build image_processor
 .PHONY: run
 run: build ## Run image_processor
 	./bin/image_processor
+
+.PHONY: test
+test: build ## Run tests
+	go test .
