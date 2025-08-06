@@ -11,5 +11,9 @@ run: build ## Run image_processor
 	./bin/image_processor
 
 .PHONY: test
-test: build ## Run tests
-	go test .
+test: build ## Run tests (and produce coverage output)
+	go test -coverprofile coverage.out .
+
+.PHONY: view-coverage
+view-coverage: test ## View coverage output in yuor browser
+	go tool cover -html=coverage.out
