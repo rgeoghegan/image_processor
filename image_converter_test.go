@@ -35,22 +35,21 @@ func TestImageConverterErrors(t *testing.T) {
 	res, err := http.Get(ts.URL)
 	require.NoError(t, err)
 	assert.Equal(t, res.StatusCode, 405)
-	assertBodyEqual(t, res, "Only accepts POST requests")
+	assertBodyEqual(t, res, "Only accepts POST requests\n")
 
 	// Endpoint requires png content-type
 	body := strings.NewReader("[1, 2, 3]")
 	res, err = http.Post(ts.URL, "application/json", body) 
 	require.NoError(t, err)
 	assert.Equal(t, res.StatusCode, 400)
-	assertBodyEqual(t, res, "Only accepts image/png")
-
+	assertBodyEqual(t, res, "Only accepts image/png\n")
 
 	// Endpoint requires a png
 	body = strings.NewReader("I am obviously not a valid png")
 	res, err = http.Post(ts.URL, "image/png", body) 
 	require.NoError(t, err)
 	assert.Equal(t, res.StatusCode, 400)
-	assertBodyEqual(t, res, "Error converting image: you suck")
+	assertBodyEqual(t, res, "Error converting image: Unsupported image format\n")
 }
 
 func TestImageConverterSuccess(t *testing.T) {
@@ -70,8 +69,8 @@ func TestImageConverterSuccess(t *testing.T) {
 	exampleJpegFile, err := os.Open("example.jpeg")
 	require.NoError(t, err)
 	defer exampleJpegFile.Close()
-
 	exampleJpeg, err := io.ReadAll(exampleJpegFile)
+
 	require.NoError(t, err)
 	assertBodyEqualBytes(t, res, exampleJpeg)
 }
