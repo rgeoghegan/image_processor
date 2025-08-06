@@ -7,6 +7,8 @@ import (
 
 func run() error {
 	http.HandleFunc("/convert", imageConverter)
+	http.HandleFunc("/resize", imageResize)
+	http.HandleFunc("/compress", imageCompress)
 
 	return http.ListenAndServe(":8080", nil)
 }

@@ -4,27 +4,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
-	"strconv"
 
 	"github.com/h2non/bimg"
 )
-
-func parseIntParam(urlValues url.Values, name string) (int, error) {
-	values, ok := urlValues[name]
-	if !ok {
-		return 0, fmt.Errorf("Invalid or missing %s url parameter", name)
-	}
-	if len(values) == 0 {
-		return 0, fmt.Errorf("Invalid or missing %s url parameter", name)
-	}
-
-	asInt, err := strconv.Atoi(values[0])
-	if err != nil {
-		return 0, fmt.Errorf("Invalid or missing %s url parameter", name)
-	}
-	return asInt, nil
-}
 
 func imageResize(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -58,7 +40,7 @@ func imageResize(w http.ResponseWriter, r *http.Request) {
 
 	resized, err := image.Resize(width, height)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error converting image: %s", err.Error()), 400)
+		http.Error(w, fmt.Sprintf("Error resizing image: %s", err.Error()), 400)
 		return
 	}
 
