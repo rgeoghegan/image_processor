@@ -33,3 +33,7 @@ The image_processor comes with three endpoints for your convenience:
 * `/convert`: convert a png to a jpeg
 
     Simply post the content of the png to the endpoint.
+
+* `/resize?width=600&height=480`: Resize an image to the given size
+
+    Post the content of the image to the endpoint, and use the url params to set the desired size.

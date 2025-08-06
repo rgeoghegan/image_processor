@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -26,12 +27,28 @@ func assertBodyEqualBytes(t *testing.T, response *http.Response, content []byte)
 	assert.Equal(t, responseBody, content)
 }
 
+// Reads a file you know is on disk, panics otherwise
+func sloppilyGetFileContent(filepath string) []byte {
+	file, err := os.Open(filepath)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	return content
+}
+
 func TestImageConverterErrors(t *testing.T) {
 	var handler http.HandlerFunc = imageConverter
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 
-	// Endpoint only responds to gets
+	// Endpoint only responds to POSTs
 	res, err := http.Get(ts.URL)
 	require.NoError(t, err)
 	assert.Equal(t, res.StatusCode, 405)
@@ -58,19 +75,13 @@ func TestImageConverterSuccess(t *testing.T) {
 	defer ts.Close()
 
 	// Endpoint requires png content-type
-	examplePng, err := os.Open("example.png")
-	require.NoError(t, err)
-	defer examplePng.Close()
+	examplePng := sloppilyGetFileContent("example.png")
 
-	res, err := http.Post(ts.URL, "image/png", examplePng) 
+	res, err := http.Post(ts.URL, "image/png", bytes.NewBuffer(examplePng) )
 	require.NoError(t, err)
 	assert.Equal(t, res.StatusCode, 200)
 
-	exampleJpegFile, err := os.Open("example.jpeg")
-	require.NoError(t, err)
-	defer exampleJpegFile.Close()
-	exampleJpeg, err := io.ReadAll(exampleJpegFile)
-
+	exampleJpeg := sloppilyGetFileContent("example.jpeg")
 	require.NoError(t, err)
 	assertBodyEqualBytes(t, res, exampleJpeg)
 }
